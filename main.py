@@ -17,10 +17,12 @@ translator = Moppm32()
 
 print('M32Bot Ready:')
 
+# If Debug is on print this to console
 def log(s):
     if DEBUG:
         print("log: " + s)
 
+# Func to send this text to the M32
 def sendmoppstr(adr, txtstr):
         log(txtstr)
         sendstr = translator.txttomopp(txtstr)
@@ -46,6 +48,7 @@ def main():
         tlg = morsecode.strip()
         log('<'+morsecode+'>')
 
+        # If we are sent the word hi send back hello.  This is our M32 test Ping.
         if morsecode.strip() == 'hi':
               sendmoppstr(client_address, 'hello')
               print("TX: hello")
