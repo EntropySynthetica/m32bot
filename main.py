@@ -1,6 +1,8 @@
 import socket
 import binascii
 import time
+import random
+import string
 from mopp import Moppm32
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -39,6 +41,21 @@ def sendmoppstr(adr, txtstr):
         time.sleep(0.2)
         sock.sendto(frame,adr)
 
+
+# Generate a random US format Callsign
+def makeCall():
+    prefixA = random.choice(['a','k','w','n'])
+    prefixB = ""
+    if random.randint(1,2) == 1:
+          prefixB = ''.join(random.choices(string.ascii_lowercase, k=1))
+    dist = ''.join(random.choices(string.digits, k=1))
+    suffix = ''.join(random.choices(string.ascii_lowercase, k=random.randint(1, 3)))
+
+    botCall = prefixA + prefixB + dist + suffix
+    
+    return botCall
+
+
 def main():
     while True:
         payload, client_address = sock.recvfrom(64)
@@ -52,6 +69,11 @@ def main():
         if morsecode.strip() == 'hi':
               sendmoppstr(client_address, 'hello')
               print("TX: hello")
+
+        if morsecode.strip() == 'test':
+              sendmoppstr(client_address, makeCall())
+              print("TX: Bot Call")
+              
 
 
 if __name__=="__main__":
