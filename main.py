@@ -3,6 +3,7 @@ import binascii
 import time
 import random
 import string
+import re
 from mopp import Moppm32
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -58,28 +59,43 @@ def makeCall():
 
 def main():
     rxBuffer = ""
+    lastRxTime = int(time.time())
 
     while True:
         payload, client_address = sock.recvfrom(64)
         b = bytearray(payload)
         hexstr  = binascii.hexlify(b)
         morsecode = translator.mopptotxt(hexstr)
-        tlg = morsecode.strip()
+
         log('<'+morsecode+'>')
 
+        # If it's been more than 8 seconds since the last RX lets clear the buffer. 
+        now = int(time.time())
+        lastRxAge = now - lastRxTime
+        if lastRxAge > 8:
+              rxBuffer = ""
+        
+        # Add the last recieved character or characters from the M32 to a buffer.
         rxBuffer = rxBuffer + str(morsecode.strip() + " ")
         print("Buffer: " + rxBuffer)
 
-        # If we are sent the word hi send back hello.  This is our M32 test Ping.
-        if morsecode.strip() == 'hi':
-              sendmoppstr(client_address, 'hello')
-              print("TX: hello")
 
-        # If we get teh wrod test send back a random US call. 
+        # If we send the word ping send back the word pong to verify everything is working.  
+        pingRex = r'^ping'
+        if re.match(pingRex, rxBuffer.replace(" ", "")):
+              print("TX: pong")
+              sendmoppstr(client_address, 'pong')
+              rxBuffer = ""
+
+
+        # If we get the word test send back a random US call. 
         if morsecode.strip() == 'test':
               sendmoppstr(client_address, makeCall())
               print("TX: Bot Call")
 
+
+        lastRxTime = int(time.time())
+        print("")
 
               
 
