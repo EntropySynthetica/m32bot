@@ -57,6 +57,8 @@ def makeCall():
 
 
 def main():
+    rxBuffer = ""
+
     while True:
         payload, client_address = sock.recvfrom(64)
         b = bytearray(payload)
@@ -65,14 +67,20 @@ def main():
         tlg = morsecode.strip()
         log('<'+morsecode+'>')
 
+        rxBuffer = rxBuffer + str(morsecode.strip() + " ")
+        print("Buffer: " + rxBuffer)
+
         # If we are sent the word hi send back hello.  This is our M32 test Ping.
         if morsecode.strip() == 'hi':
               sendmoppstr(client_address, 'hello')
               print("TX: hello")
 
+        # If we get teh wrod test send back a random US call. 
         if morsecode.strip() == 'test':
               sendmoppstr(client_address, makeCall())
               print("TX: Bot Call")
+
+
               
 
 
