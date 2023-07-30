@@ -69,12 +69,14 @@ def main():
 
         log('<'+morsecode+'>')
 
+
         # If it's been more than 8 seconds since the last RX lets clear the buffer. 
         now = int(time.time())
         lastRxAge = now - lastRxTime
         if lastRxAge > 8:
               rxBuffer = ""
         
+
         # Add the last recieved character or characters from the M32 to a buffer.
         rxBuffer = rxBuffer + str(morsecode.strip() + " ")
         print("Buffer: " + rxBuffer)
@@ -89,9 +91,11 @@ def main():
 
 
         # If we get the word test send back a random US call. 
-        if morsecode.strip() == 'test':
+        testRex = r'^test'
+        if re.match(testRex, rxBuffer.replace(" ", "")):
               sendmoppstr(client_address, makeCall())
               print("TX: Bot Call")
+              rxBuffer = ""
 
 
         lastRxTime = int(time.time())
