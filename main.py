@@ -53,13 +53,15 @@ def makeCall():
         prefixB = ''.join(random.choices(string.ascii_lowercase, k=1))
         dist = ''.join(random.choices(string.digits, k=1))
         suffix = ''.join(random.choices(string.ascii_lowercase, k=random.randint(1, 3)))
-
-    botCall = prefixA + prefixB + dist + suffix
-    return botCall
+        botCall = str(prefixA + prefixB + dist + suffix)
+        return botCall
 
 
 def main():
     rxBuffer = ""
+    state = "idle"
+    botCall = ""
+    clientCall = ""
     lastRxTime = int(time.time())
 
     while True:
@@ -77,6 +79,10 @@ def main():
         if lastRxAge > 8:
             rxBuffer = ""
             print("Buffer cleared due to timeout")
+
+        if lastRxAge > 20:
+            state = "idle"
+            print("State cleared to idle")
         
 
         # Add the last recieved character or characters from the M32 to a buffer.
@@ -103,8 +109,16 @@ def main():
         # If we heard a CQ
         cqRex = r'(?:cq){1,3}(?P<event>.*?)de(?P<cqCaller>.*?)k$'
         cqMatch = re.match(cqRex, rxBuffer.replace(" ", ""))
-        if cqMatch:
+        if cqMatch and state=="idle":
             print("CQ Found from " + cqMatch.group('cqCaller'))
+            state = "QSO"
+            print("State set to QSO")
+            botCall = makeCall()
+            clientCall = cqMatch.group('cqCaller')
+            sendmoppstr(client_address, botCall)
+
+        
+
 
 
         lastRxTime = int(time.time())
