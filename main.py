@@ -84,6 +84,7 @@ def main():
 
         if lastRxAge > 20:
             state = "idle"
+            botCall = ""
             print("State cleared to idle")
         
 
@@ -108,13 +109,14 @@ def main():
             rxBuffer = ""
 
 
+        # If we think we hear an error lets clear the buffer
         errorRex = r'.*eeee'
         if re.match(errorRex, rxBuffer.replace(" ", "")):
             print("Got Error from sender, Buffer Cleared")
             rxBuffer = ""
 
 
-        # If we heard a CQ
+        # If the bot hears a CQ
         cqRex = r'(?:cq){1,3}(?P<event>.*?)de(?P<cqCaller>.*?)k$'
         cqMatch = re.match(cqRex, rxBuffer.replace(" ", ""))
         if cqMatch and state=="idle":
@@ -125,8 +127,14 @@ def main():
             clientCall = cqMatch.group('cqCaller')
             sendmoppstr(client_address, botCall)
 
-        
 
+        # If the client is answering bot reply to CQ
+        cqAnsRex = r'(?P<botCall>.*?)de(?P<clientCall>.*?)k'
+        cqAnsMatch = re.match(cqAnsRex, rxBuffer.replace(" ", ""))
+        if cqAnsMatch and state=="QSO":
+            if cqAnsMatch.group('botCall')==botCall:
+                QSOReply = clientCall + " de " + botCall + " GA UR 5nn 5nn BK"
+                sendmoppstr(client_address, QSOReply)
 
 
         lastRxTime = int(time.time())
