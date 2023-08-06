@@ -128,6 +128,14 @@ def main():
             sendmoppstr(client_address, botCall)
 
 
+        # if the bot hears agn
+        agnRex = r'^agn'
+        agnMatch = re.match(agnRex, rxBuffer.replace(" ", ""))
+        if agnMatch and state=="QSO":
+            sendmoppstr(client_address, botCall)
+            print("Bot is resending it's call")
+
+
         # If the client is answering bot reply to CQ
         cqAnsRex = r'(?P<botCall>.*?)de(?P<clientCall>.*?)k'
         cqAnsMatch = re.match(cqAnsRex, rxBuffer.replace(" ", ""))
