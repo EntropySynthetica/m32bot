@@ -51,10 +51,12 @@ def makeCall():
     prefixB = ""
     if random.randint(1,2) == 1:
         prefixB = ''.join(random.choices(string.ascii_lowercase, k=1))
-        dist = ''.join(random.choices(string.digits, k=1))
-        suffix = ''.join(random.choices(string.ascii_lowercase, k=random.randint(1, 3)))
-        botCall = str(prefixA + prefixB + dist + suffix)
-        return botCall
+    dist = ''.join(random.choices(string.digits, k=1))
+    suffix = ''.join(random.choices(string.ascii_lowercase, k=random.randint(1, 3)))
+
+    botCall = str(prefixA + prefixB + dist + suffix)
+
+    return botCall
 
 
 def main():
@@ -103,6 +105,12 @@ def main():
         if re.match(testRex, rxBuffer.replace(" ", "")):
             sendmoppstr(client_address, makeCall())
             print("TX: Bot Call")
+            rxBuffer = ""
+
+
+        errorRex = r'.*eeee'
+        if re.match(errorRex, rxBuffer.replace(" ", "")):
+            print("Got Error from sender, Buffer Cleared")
             rxBuffer = ""
 
 
