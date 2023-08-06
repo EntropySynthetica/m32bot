@@ -82,7 +82,7 @@ def main():
             rxBuffer = ""
             print("Buffer cleared due to timeout")
 
-        if lastRxAge > 20:
+        if lastRxAge > 60:
             state = "idle"
             botCall = ""
             print("State cleared to idle")
@@ -116,7 +116,7 @@ def main():
             rxBuffer = ""
 
 
-        # If the bot hears a CQ
+        # If the bot hears a CQ lets gen a call and reply.  
         cqRex = r'(?:cq){1,3}(?P<event>.*?)de(?P<cqCaller>.*?)k$'
         cqMatch = re.match(cqRex, rxBuffer.replace(" ", ""))
         if cqMatch and state=="idle":
@@ -128,7 +128,7 @@ def main():
             sendmoppstr(client_address, botCall)
 
 
-        # if the bot hears agn
+        # if the bot hears agn lets repeat the bots call.
         agnRex = r'^agn'
         agnMatch = re.match(agnRex, rxBuffer.replace(" ", ""))
         if agnMatch and state=="QSO":
@@ -143,6 +143,16 @@ def main():
             if cqAnsMatch.group('botCall')==botCall:
                 QSOReply = clientCall + " de " + botCall + " GA UR 5nn 5nn BK"
                 sendmoppstr(client_address, QSOReply)
+
+
+        # If the bot hears 73 sk then it will end the QSO and return state to idle"
+        endQSORex = r'.*73sk'
+        endQSOMatch = re.match(endQSORex, rxBuffer.replace(" ", ""))
+        if endQSOMatch and state=="QSO":
+            endReply = clientCall + " de " + botCall + " 73 sk"
+            sendmoppstr(client_address, endReply)
+            state = "idle"
+            botCall = ""
 
 
         lastRxTime = int(time.time())
