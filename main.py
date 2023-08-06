@@ -20,10 +20,12 @@ translator = Moppm32()
 
 print('M32Bot Ready:')
 
+
 # If Debug is on print this to console
 def log(s):
     if DEBUG:
         print("log: " + s)
+
 
 # Func to send this text to the M32
 def sendmoppstr(adr, txtstr):
@@ -53,7 +55,6 @@ def makeCall():
         suffix = ''.join(random.choices(string.ascii_lowercase, k=random.randint(1, 3)))
 
     botCall = prefixA + prefixB + dist + suffix
-    
     return botCall
 
 
@@ -75,6 +76,7 @@ def main():
         lastRxAge = now - lastRxTime
         if lastRxAge > 8:
             rxBuffer = ""
+            print("Buffer cleared due to timeout")
         
 
         # Add the last recieved character or characters from the M32 to a buffer.
@@ -98,10 +100,15 @@ def main():
             rxBuffer = ""
 
 
+        # If we heard a CQ
+        cqRex = r'(?:cq){1,3}(?P<event>.*?)de(?P<cqCaller>.*?)k$'
+        cqMatch = re.match(cqRex, rxBuffer.replace(" ", ""))
+        if cqMatch:
+            print("CQ Found from " + cqMatch.group('cqCaller'))
+
+
         lastRxTime = int(time.time())
         print("")
-
-              
 
 
 if __name__=="__main__":
