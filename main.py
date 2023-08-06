@@ -82,6 +82,7 @@ def main():
             rxBuffer = ""
             print("Buffer cleared due to timeout")
 
+        # If it's been more than 60 seconds lets reset state to idle and drop any QSOs. 
         if lastRxAge > 60:
             state = "idle"
             botCall = ""
